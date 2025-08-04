@@ -270,9 +270,97 @@ h3 {
   margin: 20px auto;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #667eea;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Modal for cuisine pages */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal .modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  margin: 20px;
+}
+
+.modal .close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #667eea;
+}
+
+.modal .close:hover {
+  color: #764ba2;
+}
+
+/* Dish card styles for cuisine pages */
+.dish-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.dish-card:hover {
+  transform: translateY(-5px);
+}
+
+.dish-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.dish-card h3 {
+  padding: 15px;
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.dish-card button {
+  width: 100%;
+  padding: 12px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.dish-card button:hover {
+  background-color: #764ba2;
 }
 
 /* Footer */
@@ -317,7 +405,8 @@ footer a:hover {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 
-  .modal-content {
+  .modal-content,
+  .modal .modal-content {
     margin: 20px;
     padding: 20px;
   }

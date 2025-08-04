@@ -22,37 +22,101 @@
 
   <main>
     <h2>Asian Dishes</h2>
-
-    <div class="dish-card">
-      <h3>Sushi (Japan)</h3>
-      <p>Ingredients: Sushi Rice, Nori, Raw Fish, Soy Sauce</p>
-      <a href="https://youtu.be/joweUxpHaqc?si=eATPjORHpIYdq2Bg" target="_blank" rel="noopener">Watch Recipe</a>
-    </div>
-
-    <div class="dish-card">
-      <h3>Biryani (India)</h3>
-      <p>Ingredients: Basmati Rice, Chicken, Saffron, Yogurt, Spices</p>
-      <a href="https://youtu.be/DOjNC_BkZiM?si=MnmtwzMATqxFbUHf" target="_blank" rel="noopener">Watch Recipe</a>
-    </div>
-
-    <div class="dish-card">
-      <h3>Tom Yum (Thailand)</h3>
-      <p>Ingredients: Lemongrass, Shrimp, Lime Juice, Fish Sauce</p>
-      <a href="https://youtu.be/TLl8n5WJJfI?si=Qwmvu3EoODOWYQQO" target="_blank" rel="noopener">Watch Recipe</a>
-    </div>
-
-    <div class="dish-card">
-      <h3>Beef Bulgogi (South Korea)</h3>
-      <p>Ingredients: Beef, Soy Sauce, Garlic, Sugar, Sesame Oil</p>
-      <a href="https://youtu.be/djM3z5VHSAY?si=beT5bU4IBVEaFAxw" target="_blank" rel="noopener">Watch Recipe</a>
-    </div>
-
-    <div class="dish-card">
-      <h3>Chicken Adobo (Philippines)</h3>
-      <p>Ingredients: Chicken, Soy Sauce, Vinegar, Garlic, Bay Leaf</p>
-      <a href="https://youtu.be/wwapBsT0oc8?si=FyATr1twYJ0bOyg5" target="_blank" rel="noopener">Watch Recipe</a>
-    </div>
+    <div class="loading" id="loading">Loading recipes...</div>
+    <div class="recipes-container" id="recipes-container"></div>
   </main>
+
+  <script>
+    const API_BASE_URL = '/api';
+    const API_KEY = 'secure-api-key-2024';
+    const asianCountries = ['Chinese', 'Japanese', 'Thai', 'Indian', 'Vietnamese'];
+
+    async function apiRequest(url) {
+      const response = await fetch(url, {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      return response.json();
+    }
+
+    async function loadAsianRecipes() {
+      try {
+        const allMeals = [];
+        for (const country of asianCountries) {
+          try {
+            const data = await apiRequest(`${API_BASE_URL}/recipes/area/${country}`);
+            if (data.success && data.meals) {
+              allMeals.push(...data.meals.slice(0, 4)); // Limit to 4 per country
+            }
+          } catch (error) {
+            console.log(`No recipes found for ${country}`);
+          }
+        }
+        
+        if (allMeals.length > 0) {
+          displayRecipes(allMeals);
+        } else {
+          document.getElementById('recipes-container').innerHTML = '<p>No Asian recipes found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('recipes-container').innerHTML = '<p>Error loading recipes.</p>';
+      }
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    function displayRecipes(meals) {
+      const container = document.getElementById('recipes-container');
+      container.innerHTML = meals.map(meal => `
+        <div class="dish-card">
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}" loading="lazy">
+          <h3>${meal.strMeal}</h3>
+          <button onclick="showRecipeDetails('${meal.idMeal}')">View Full Recipe</button>
+        </div>
+      `).join('');
+    }
+
+    async function showRecipeDetails(mealId) {
+      try {
+        const data = await apiRequest(`${API_BASE_URL}/recipes/details/${mealId}`);
+        if (data.success && data.meal) {
+          displayMealModal(data.meal);
+        }
+      } catch (error) {
+        alert('Error loading recipe details');
+      }
+    }
+
+    function displayMealModal(meal) {
+      const ingredients = getIngredientsList(meal);
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+          <h2>${meal.strMeal}</h2>
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width: 100%; max-width: 400px;">
+          <h3>Ingredients:</h3>
+          <ul>${ingredients}</ul>
+          <h3>Instructions:</h3>
+          <p>${meal.strInstructions}</p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function getIngredientsList(meal) {
+      let ingredients = '';
+      for (let i = 1; i <= 20; i++) {
+        const ingredient = meal[`strIngredient${i}`];
+        const measure = meal[`strMeasure${i}`];
+        if (ingredient && ingredient.trim()) {
+          ingredients += `<li>${ingredient} - ${measure || ''}</li>`;
+        }
+      }
+      return ingredients;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAsianRecipes);
+  </script>
 
   <footer>
     <p>&copy; 2025 Millo's Cuisine Explorer. All rights reserved.</p>

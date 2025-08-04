@@ -327,11 +327,16 @@ function displayMealDetails(meal) {
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>${meal.strMeal}</h2>
-            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-            <h3>Ingredients</h3>
-            <ul>${getIngredientsList(meal)}</ul>
-            <h3>Instructions</h3>
-            <p>${meal.strInstructions}</p>
+            <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width: 100%; max-width: 400px; border-radius: 10px;">
+            <div style="margin: 20px 0;">
+                <h3 style="color: #667eea; margin-bottom: 15px;">Ingredients:</h3>
+                <ul style="list-style: none; padding: 0;">${getIngredientsList(meal)}</ul>
+            </div>
+            <div style="margin: 20px 0;">
+                <h3 style="color: #667eea; margin-bottom: 15px;">Instructions:</h3>
+                <p style="line-height: 1.6; text-align: justify;">${meal.strInstructions}</p>
+            </div>
+            ${meal.strYoutube ? `<div style="margin: 20px 0;"><a href="${meal.strYoutube}" target="_blank" style="background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Watch Video</a></div>` : ''}
         </div>
     `;
     
@@ -358,10 +363,10 @@ function getIngredientsList(meal) {
         const ingredient = meal[`strIngredient${i}`];
         const measure = meal[`strMeasure${i}`];
         if (ingredient && ingredient.trim() !== '') {
-            ingredients += `<li>${ingredient} - ${measure || ''}</li>`;
+            ingredients += `<li style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;"><span style="font-weight: 500;">${ingredient}</span><span style="color: #666;">${measure || ''}</span></li>`;
         }
     }
-    return ingredients;
+    return ingredients || '<li>No ingredients available</li>';
 }
 
 // Helper function to show loading indicator
