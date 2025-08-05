@@ -82,6 +82,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
+// Serve static files from the current directory
 app.use(express.static(path.join(__dirname)));
 app.use(rateLimit);
 
@@ -141,10 +142,10 @@ app.get('/api/recipes/random', validateApiKey, async (req, res) => {
         const results = await Promise.all(promises);
         const meals = results.map(result => result.meals[0]).filter(meal => meal);
         
-        res.json({ meals, success: true });
-    } catch (error) {
-        res.status(500).json({ error: error.message, success: false });
-    }
+    res.json({ meals, success: true });
+} catch (error) {
+    res.status(500).json({ error: error.message, success: false });
+}
 });
 
 // Search recipes by name
@@ -255,20 +256,15 @@ app.get('/api/recipes/african', validateApiKey, async (req, res) => {
     }
 });
 
-// Serve the main HTML file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!', success: false });
 });
 
-// 404 handler
-app.use((req, res) => {
-    res.status(404).json({ error: 'Endpoint not found', success: false });
+// Catch-all route to serve the main HTML file
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
